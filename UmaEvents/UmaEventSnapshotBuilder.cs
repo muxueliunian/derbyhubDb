@@ -52,7 +52,7 @@ public sealed class UmaEventSnapshotBuilder
             }
         }
 
-        return FinalizeSnapshot(characters, generatedAt, sourceVersion, unclassified);
+        return FinalizeSnapshot(characters, master, generatedAt, sourceVersion, unclassified);
     }
 
     private static UmaEventEventResponse BuildEvent(StoryEvent story, string sourceCategory)
@@ -180,15 +180,17 @@ public sealed class UmaEventSnapshotBuilder
 
     private static SnapshotBuildResult FinalizeSnapshot(
         Dictionary<int, CharacterAccumulator> characterMap,
+        MasterData master,
         DateTimeOffset generatedAt,
         string sourceVersion,
         IReadOnlyCollection<StoryEvent> unclassified)
     {
         var generated = generatedAt.UtcDateTime.ToString("O");
+        var identityDiagnostics = new VariantIdentityDiagnostics();
         var details = characterMap.Values
             .Where(x => x.HasAnyEvents)
             .OrderBy(x => x.CharacterId)
-            .Select(x => x.ToDetail(generated))
+            .Select(x => x.ToDetail(generated, master.DefaultCardIds, identityDiagnostics))
             .ToList();
 
         var catalog = new UmaEventCatalogResponse
@@ -249,7 +251,9 @@ public sealed class UmaEventSnapshotBuilder
             CharacterCount = details.Count,
             VariantCount = variantCount,
             EventCount = eventCount,
-            UnclassifiedEvents = unclassified.ToList()
+            UnclassifiedEvents = unclassified.ToList(),
+            VariantIdentityWarnings = identityDiagnostics.Warnings.ToList(),
+            VariantIdentityBlocks = identityDiagnostics.Blocks.ToList()
         };
     }
 
@@ -360,7 +364,10 @@ public sealed class UmaEventSnapshotBuilder
             }
         }
 
-        public UmaEventCharacterDetailResponse ToDetail(string generatedAt)
+        public UmaEventCharacterDetailResponse ToDetail(
+            string generatedAt,
+            IReadOnlyDictionary<long, long> defaultCardIds,
+            VariantIdentityDiagnostics identityDiagnostics)
         {
             var response = new UmaEventCharacterDetailResponse
             {
@@ -374,7 +381,7 @@ public sealed class UmaEventSnapshotBuilder
 
             foreach (var variant in _variants.Values.OrderBy(x => x.VariantId))
             {
-                response.Variants.Add(variant.ToSummary());
+                response.Variants.Add(variant.ToSummary(CharacterId, BaseVariantId, defaultCardIds, identityDiagnostics));
                 if (variant.VariantType != "base")
                 {
                     response.OutfitVariants.Add(variant.ToDetail());
@@ -411,11 +418,29 @@ public sealed class UmaEventSnapshotBuilder
             _exclusiveEvents.TryAdd(eventResponse.EventId, eventResponse);
         }
 
-        public UmaEventVariantSummaryResponse ToSummary()
+        public UmaEventVariantSummaryResponse ToSummary(
+            int characterId,
+            int baseVariantId,
+            IReadOnlyDictionary<long, long> defaultCardIds,
+            VariantIdentityDiagnostics identityDiagnostics)
         {
+            var identity = VariantIdentityResolver.Resolve(
+                characterId,
+                baseVariantId,
+                VariantId,
+                VariantType,
+                defaultCardIds,
+                identityDiagnostics);
+
             return new UmaEventVariantSummaryResponse
             {
                 VariantId = VariantId,
+                EventVariantId = identity.EventVariantId,
+                CardId = identity.CardId,
+                AvatarCardId = identity.AvatarCardId,
+                SearchCardId = identity.SearchCardId,
+                VariantKind = identity.VariantKind,
+                AwakeningLevel = identity.AwakeningLevel,
                 VariantType = VariantType,
                 VariantNameJa = VariantNameJa,
                 ExclusiveEventCount = _exclusiveEvents.Count
@@ -443,4 +468,6 @@ public sealed class SnapshotBuildResult
     public int VariantCount { get; init; }
     public int EventCount { get; init; }
     public List<StoryEvent> UnclassifiedEvents { get; init; } = [];
+    public List<string> VariantIdentityWarnings { get; init; } = [];
+    public List<string> VariantIdentityBlocks { get; init; } = [];
 }

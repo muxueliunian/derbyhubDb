@@ -30,6 +30,7 @@ public sealed class MasterData
     public List<SingleModeStoryData> Stories { get; init; } = [];
     public Dictionary<long, string> BaseNames { get; init; } = [];
     public Dictionary<long, UmaName> UmaNames { get; init; } = [];
+    public Dictionary<long, long> DefaultCardIds { get; init; } = [];
     public Dictionary<long, string> SupportCardNames { get; init; } = [];
     public Dictionary<string, long> NameToId { get; init; } = [];
 

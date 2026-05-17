@@ -54,6 +54,7 @@ dotnet run -- --snapshot-in "C:\Users\atlas\Desktop\uma_web_3\derbyhubDb\tmp\sna
 - 不提交 `master.mdb`、story extracted、原始游戏资源、token 或 `tmp/` 输出。
 - `AGENT.md` / `AGENTS.md` 等本地 agent 协作文件默认不纳入 git。
 - Release package 中的 checksum 只用于下载完整性校验，不声明防止有 Release 写权限者替换资产。
+- Snapshot catalog variant 已新增规范身份字段：`eventVariantId` 保留事件 variant id，`cardId` / `avatarCardId` / `searchCardId` 使用真实卡 id 语义，`variantKind` 区分 `base`、`card`、`awakening7`。
 
 ## 后续计划
 
@@ -63,4 +64,3 @@ dotnet run -- --snapshot-in "C:\Users\atlas\Desktop\uma_web_3\derbyhubDb\tmp\sna
 4. DerbyHub 后端实现 `DataReleaseStore`、`UmaEventSnapshotCache` 与 Release dry-run 校验管线。
 5. DerbyHub 后端提供 `/api/public/static-data/*` 静态数据接口。
 6. DerbyHub 前端将 calculator 数据源切到后端静态数据接口，并为头像补 `?v={dataVersion}`。
-

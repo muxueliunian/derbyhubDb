@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace derbyhubDb.UmaEvents;
 
 public sealed class UmaEventSnapshotData
@@ -57,9 +59,18 @@ public sealed class UmaEventCharacterDetailResponse
 public sealed class UmaEventVariantSummaryResponse
 {
     public int VariantId { get; set; }
+    public int EventVariantId { get; set; }
+    public int? CardId { get; set; }
+    public int? AvatarCardId { get; set; }
+    public int? SearchCardId { get; set; }
+    public string VariantKind { get; set; } = string.Empty;
+    public int? AwakeningLevel { get; set; }
     public string VariantType { get; set; } = string.Empty;
     public string VariantNameJa { get; set; } = string.Empty;
     public int ExclusiveEventCount { get; set; }
+
+    [JsonIgnore]
+    public bool HasIdentityFields => EventVariantId != 0 || !string.IsNullOrWhiteSpace(VariantKind);
 }
 
 public sealed class UmaEventVariantDetailResponse

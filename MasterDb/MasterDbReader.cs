@@ -41,6 +41,11 @@ public static class MasterDbReader
             .GroupBy(x => x.Id)
             .ToDictionary(x => x.Key, x => x.First().Name!);
 
+        var defaultCardIds = umaNames.Values
+            .Where(x => IsRealCardId(x.CharaId, x.Id))
+            .GroupBy(x => x.CharaId)
+            .ToDictionary(x => x.Key, x => x.Min(v => v.Id));
+
         var nameToId = textData
             .Where(x => x.Index != 9100101 && x.Index != 9101101)
             .Where(x => (x.Id == 4 && x.Category == 4) || (x.Id == 6 && x.Category == 6) || (x.Id == 75 && x.Category == 75))
@@ -55,6 +60,7 @@ public static class MasterDbReader
             Stories = storyData,
             BaseNames = baseNames,
             UmaNames = umaNames,
+            DefaultCardIds = defaultCardIds,
             SupportCardNames = supportCardNames,
             NameToId = nameToId
         };
@@ -134,5 +140,13 @@ public static class MasterDbReader
         var raw = cardId.ToString();
         var slice = raw[0] == '9' && raw.Length >= 5 ? raw[1..5] : raw[..Math.Min(4, raw.Length)];
         return long.TryParse(slice, out var charaId) ? charaId : 0;
+    }
+
+    private static bool IsRealCardId(long charaId, long cardId)
+    {
+        var raw = cardId.ToString();
+        return raw.Length == 6
+            && raw[0] != '9'
+            && cardId / 100 == charaId;
     }
 }

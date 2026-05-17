@@ -164,10 +164,15 @@ public sealed class CalculatorDataGenerator
                     continue;
                 }
 
-                var cardId = NormalizeDisplayCardId(variant.VariantId);
-                if (addedCardIds.Add(cardId))
+                var cardId = ResolveSearchCardId(character, variant);
+                if (cardId is null)
                 {
-                    sourceCharacter.Variants.Add(new SourceVariant(cardId));
+                    continue;
+                }
+
+                if (addedCardIds.Add(cardId.Value))
+                {
+                    sourceCharacter.Variants.Add(new SourceVariant(cardId.Value));
                 }
             }
 
@@ -187,12 +192,9 @@ public sealed class CalculatorDataGenerator
             || variant.VariantId == character.CharacterId * 100;
     }
 
-    private static int NormalizeDisplayCardId(int variantId)
+    private static int? ResolveSearchCardId(UmaEventCatalogCharacterResponse character, UmaEventVariantSummaryResponse variant)
     {
-        var text = variantId.ToString();
-        return text.Length == 7 && text[0] == '9'
-            ? int.Parse(text[1..])
-            : variantId;
+        return VariantIdentityResolver.ResolveSearchCardId(character.CharacterId, character.BaseVariantId, variant);
     }
 
     private static string ResolveName(

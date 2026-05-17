@@ -75,18 +75,18 @@ public sealed class CharacterAssetGenerator
 
             var addedCardIds = new HashSet<int>();
             foreach (var variant in character.Variants
-                .OrderBy(x => NormalizeDisplayCardId(character.CharacterId, x.VariantId))
+                .OrderBy(x => ResolveAssetCardId(character, x) ?? int.MaxValue)
                 .ThenBy(x => x.VariantId))
             {
-                var cardId = NormalizeDisplayCardId(character.CharacterId, variant.VariantId);
-                var avatar = $"chara_{cardId}.png";
+                var cardId = ResolveAssetCardId(character, variant);
+                var avatar = $"chara_{cardId ?? 0}.png";
                 var targetPath = Path.Combine(targetRoot, "assets", "chara", avatar);
                 var existingPublicPath = publicRoot is null ? null : Path.Combine(publicRoot, "assets", "chara", avatar);
                 var entry = new CharacterAssetManifestEntry
                 {
                     CharacterId = character.CharacterId,
                     VariantId = variant.VariantId,
-                    CardId = cardId,
+                    CardId = cardId ?? 0,
                     NameJa = character.NameJa,
                     VariantNameJa = variant.VariantNameJa,
                     LocalPath = targetPath
@@ -102,11 +102,21 @@ public sealed class CharacterAssetGenerator
                     continue;
                 }
 
-                if (addedCardIds.Add(cardId))
+                if (cardId is null)
+                {
+                    entry.Source = "missing";
+                    entry.Status = "failed";
+                    entry.Error = "catalog variant 缺少 avatarCardId，无法解析头像 card_id";
+                    entry.NeedsHumanReview = true;
+                    manifest.Entries.Add(entry);
+                    continue;
+                }
+
+                if (addedCardIds.Add(cardId.Value))
                 {
                     outputCharacter.Variants.Add(new DerbyHubCharacterVariant
                     {
-                        CardId = cardId,
+                        CardId = cardId.Value,
                         Avatar = avatar
                     });
                 }
@@ -115,10 +125,10 @@ public sealed class CharacterAssetGenerator
                 await _imageResolver.ResolveAsync(
                     new CharacterImageRequest(
                         character.CharacterId,
-                        cardId,
+                        cardId.Value,
                         targetPath,
                         existingPublicPath,
-                        localCandidatesByCardId.GetValueOrDefault(cardId) ?? []),
+                        localCandidatesByCardId.GetValueOrDefault(cardId.Value) ?? []),
                     entry,
                     context,
                     cancellationToken);
@@ -155,16 +165,9 @@ public sealed class CharacterAssetGenerator
             || variant.VariantId == character.CharacterId * 100;
     }
 
-    private static int NormalizeDisplayCardId(int characterId, int variantId)
+    private static int? ResolveAssetCardId(UmaEventCatalogCharacterResponse character, UmaEventVariantSummaryResponse variant)
     {
-        _ = characterId;
-        var text = variantId.ToString();
-        if (text.Length == 7 && text[0] == '9')
-        {
-            return int.Parse(text[1..]);
-        }
-
-        return variantId;
+        return VariantIdentityResolver.ResolveAvatarCardId(character.CharacterId, character.BaseVariantId, variant);
     }
 
     private static List<LocalAssetLookupRequest> BuildLocalAssetLookupRequests(UmaEventSnapshotData snapshot)
@@ -172,9 +175,15 @@ public sealed class CharacterAssetGenerator
         return snapshot.Catalog.Characters
             .SelectMany(character => character.Variants
                 .Where(variant => !IsBaseVariant(character, variant))
+                .Select(variant => new
+                {
+                    Character = character,
+                    CardId = ResolveAssetCardId(character, variant)
+                })
+                .Where(x => x.CardId is not null)
                 .Select(variant => new LocalAssetLookupRequest(
-                    character.CharacterId,
-                    NormalizeDisplayCardId(character.CharacterId, variant.VariantId))))
+                    variant.Character.CharacterId,
+                    variant.CardId!.Value)))
             .ToList();
     }
 

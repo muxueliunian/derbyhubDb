@@ -61,9 +61,29 @@
     },
     "variantSummary": {
       "type": "object",
-      "required": ["variantId", "variantType", "variantNameJa", "exclusiveEventCount"],
+      "required": [
+        "variantId",
+        "eventVariantId",
+        "cardId",
+        "avatarCardId",
+        "searchCardId",
+        "variantKind",
+        "awakeningLevel",
+        "variantType",
+        "variantNameJa",
+        "exclusiveEventCount"
+      ],
       "properties": {
         "variantId": { "type": "integer" },
+        "eventVariantId": { "type": "integer" },
+        "cardId": { "type": ["integer", "null"] },
+        "avatarCardId": { "type": ["integer", "null"] },
+        "searchCardId": { "type": ["integer", "null"] },
+        "variantKind": {
+          "type": "string",
+          "enum": ["base", "card", "awakening7", "unknown"]
+        },
+        "awakeningLevel": { "type": ["integer", "null"] },
         "variantType": { "type": "string" },
         "variantNameJa": { "type": "string" },
         "exclusiveEventCount": { "type": "integer", "minimum": 0 }

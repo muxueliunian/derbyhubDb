@@ -58,3 +58,16 @@ The v1 JSON Schema files live in `schemas/`:
 - `schemas/snapshot.schema.json`
 - `schemas/characters.schema.json`
 - `schemas/release-manifest.schema.json`
+
+## Snapshot catalog variant identity
+
+`catalog.characters[].variants[]` keeps the legacy `variantId`, `variantType`, `variantNameJa`, and `exclusiveEventCount` fields. New snapshots also emit normalized identity fields:
+
+- `eventVariantId`: the original event variant id, equal to the legacy `variantId`.
+- `cardId`: the real six-digit card id when one can be resolved.
+- `avatarCardId`: the card id to use for avatar asset lookup.
+- `searchCardId`: the card id to use for normal search/calculator indexing; awakening 7 variants set this to `null`.
+- `variantKind`: `base`, `card`, `awakening7`, or `unknown`.
+- `awakeningLevel`: `5` for base/normal card variants, `7` for awakening 7 variants.
+
+Base synthetic ids such as `characterId * 100` are mapped to the character's default real card id from `master.mdb`. Event ids shaped as `9 + six-digit cardId`, for example `9100101`, are normalized to the real `cardId` `100101` and marked as `awakening7`.
