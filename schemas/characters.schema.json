@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://derbyhub.local/schemas/characters.schema.json",
+  "title": "DerbyHub Calculator CharacterDataFile v1",
+  "type": "object",
+  "required": ["version", "characters", "compatibility_table", "grade_thresholds"],
+  "properties": {
+    "version": { "type": "string", "minLength": 1 },
+    "characters": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/character" }
+    },
+    "compatibility_table": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "tag_compatibility": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "grade_thresholds": {
+      "type": "object",
+      "required": ["double_circle", "circle", "triangle", "cross"],
+      "properties": {
+        "double_circle": { "type": "integer" },
+        "circle": { "type": "integer" },
+        "triangle": { "type": "integer" },
+        "cross": { "type": "integer" }
+      },
+      "additionalProperties": { "type": "integer" }
+    }
+  },
+  "$defs": {
+    "character": {
+      "type": "object",
+      "required": ["id", "name_ja", "variants"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name_ja": { "type": "string" },
+        "name_zh": { "type": "string" },
+        "name_en": { "type": "string" },
+        "variants": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/variant" }
+        },
+        "compatibility_tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "variant": {
+      "type": "object",
+      "required": ["card_id", "avatar", "aptitude"],
+      "properties": {
+        "card_id": { "type": "integer" },
+        "avatar": { "type": "string", "pattern": "^chara_[0-9]+\\.png$" },
+        "aptitude": {
+          "type": "object",
+          "required": ["turf", "dirt", "short", "mile", "middle", "long", "nige", "senko", "sashi", "oikomi"],
+          "additionalProperties": { "type": "integer" }
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

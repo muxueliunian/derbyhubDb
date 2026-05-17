@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://derbyhub.local/schemas/release-manifest.schema.json",
+  "title": "DerbyHub Data Release Manifest v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "snapshotSchemaVersion",
+    "charactersSchemaVersion",
+    "locale",
+    "releaseTag",
+    "channel",
+    "generatorVersion",
+    "generatorCommit",
+    "generatedAt",
+    "sourceVersion",
+    "characterCount",
+    "variantCount",
+    "eventCount",
+    "compatibilityCount",
+    "imageCount",
+    "assets"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "snapshotSchemaVersion": { "const": 1 },
+    "charactersSchemaVersion": { "const": 1 },
+    "locale": { "type": "string" },
+    "releaseTag": { "type": "string", "minLength": 1 },
+    "channel": { "enum": ["stable", "prerelease"] },
+    "generatorVersion": { "type": "string", "minLength": 1 },
+    "generatorCommit": { "type": ["string", "null"] },
+    "generatedAt": { "type": "string" },
+    "sourceVersion": { "type": "string", "minLength": 1 },
+    "originalSourceVersion": { "type": ["string", "null"] },
+    "characterCount": { "type": "integer", "minimum": 0 },
+    "variantCount": { "type": "integer", "minimum": 0 },
+    "eventCount": { "type": "integer", "minimum": 0 },
+    "compatibilityCount": { "type": "integer", "minimum": 0 },
+    "imageCount": { "type": "integer", "minimum": 0 },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    }
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": ["fileName", "sha256", "sizeBytes"],
+      "properties": {
+        "fileName": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "sizeBytes": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": true
+}

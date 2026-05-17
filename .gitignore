@@ -1,0 +1,13 @@
+bin/
+obj/
+tmp/
+*.user
+*.suo
+
+# Local agent / workspace guidance, not part of the public generator project.
+AGENT.md
+AGENTS.md
+.agents/
+.codex/
+docs/dev/
+*.local.md

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://derbyhub.local/schemas/snapshot.schema.json",
+  "title": "DerbyHub UmaEventSnapshotData v1",
+  "type": "object",
+  "required": ["manifest", "catalog", "characters"],
+  "properties": {
+    "manifest": {
+      "type": "object",
+      "required": ["locale", "sourceType", "sourceVersion", "generatedAt", "characterCount", "variantCount", "eventCount"],
+      "properties": {
+        "locale": { "type": "string" },
+        "textVariant": { "type": "string" },
+        "sourceType": { "type": "string" },
+        "sourceVersion": { "type": "string" },
+        "generatedAt": { "type": "string" },
+        "characterCount": { "type": "integer", "minimum": 0 },
+        "variantCount": { "type": "integer", "minimum": 0 },
+        "eventCount": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "catalog": {
+      "type": "object",
+      "required": ["locale", "sourceType", "sourceVersion", "generatedAt", "characterCount", "variantCount", "eventCount", "characters"],
+      "properties": {
+        "locale": { "type": "string" },
+        "textVariant": { "type": "string" },
+        "sourceType": { "type": "string" },
+        "sourceVersion": { "type": "string" },
+        "generatedAt": { "type": "string" },
+        "characterCount": { "type": "integer", "minimum": 0 },
+        "variantCount": { "type": "integer", "minimum": 0 },
+        "eventCount": { "type": "integer", "minimum": 0 },
+        "characters": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/catalogCharacter" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "characters": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/characterDetail" }
+    }
+  },
+  "$defs": {
+    "catalogCharacter": {
+      "type": "object",
+      "required": ["characterId", "nameJa", "baseVariantId", "variants"],
+      "properties": {
+        "characterId": { "type": "integer" },
+        "nameJa": { "type": "string" },
+        "baseVariantId": { "type": "integer" },
+        "variants": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/variantSummary" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "variantSummary": {
+      "type": "object",
+      "required": ["variantId", "variantType", "variantNameJa", "exclusiveEventCount"],
+      "properties": {
+        "variantId": { "type": "integer" },
+        "variantType": { "type": "string" },
+        "variantNameJa": { "type": "string" },
+        "exclusiveEventCount": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "characterDetail": {
+      "type": "object",
+      "required": ["characterId", "nameJa", "variants", "baseEvents", "characterCommonEvents", "outfitVariants"],
+      "properties": {
+        "characterId": { "type": "integer" },
+        "nameJa": { "type": "string" },
+        "variants": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/variantSummary" }
+        },
+        "baseEvents": { "type": "array" },
+        "characterCommonEvents": { "type": "array" },
+        "outfitVariants": { "type": "array" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}
