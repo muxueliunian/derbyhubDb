@@ -1,0 +1,49 @@
+{
+  "characters": [
+    {
+      "characterId": 1118,
+      "nameJa": "アドマイヤグルーヴ",
+      "nameZh": "爱慕律动",
+      "nameEn": "Admire Groove",
+      "source": "manual-review",
+      "reviewed": true,
+      "note": "2026-05-19 用户审核通过；未找到明确官方中文马名。"
+    },
+    {
+      "characterId": 1130,
+      "nameJa": "ラッキーライラック",
+      "nameZh": "旺紫丁",
+      "nameEn": "Lucky Lilac",
+      "source": "hkjc/jra-van/manual-review",
+      "reviewed": true,
+      "note": "中文采用香港马会繁体官方马名；英文采用 JRA/JRA-VAN 马名。"
+    },
+    {
+      "characterId": 1135,
+      "nameJa": "ステイゴールド",
+      "nameZh": "黄金旅程",
+      "nameEn": "Stay Gold",
+      "source": "hkjc/jra-van/manual-review",
+      "reviewed": true,
+      "note": "中文由香港马会繁体官方马名“黃金旅程”简体化。"
+    },
+    {
+      "characterId": 1137,
+      "nameJa": "キセキ",
+      "nameZh": "神业",
+      "nameEn": "Kiseki",
+      "source": "hkjc/jra-van/manual-review",
+      "reviewed": true,
+      "note": "中文由香港马会繁体官方马名“神業”简体化。"
+    },
+    {
+      "characterId": 1143,
+      "nameJa": "ヴィクトワールピサ",
+      "nameZh": "比萨胜驹",
+      "nameEn": "Victoire Pisa",
+      "source": "hkjc/jra-van/manual-review",
+      "reviewed": true,
+      "note": "中文由香港马会繁体官方马名“比薩勝駒”简体化。"
+    }
+  ]
+}
